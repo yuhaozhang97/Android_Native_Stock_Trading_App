@@ -1,7 +1,6 @@
-# Android_Native_Stock_Trading_App
+# Android Stock Trading App Mobile Frontend
 * Stock trading app run on Android phone.
 
 ## Main Technology Used
-* Java, Android Studio
-* Node.js, Express.js
-* Backend deployed on AWS Elastic Beanstalk
+* Java, Android Studio, HTML, JavaScript
+* Node Backend deployed on AWS Elastic Beanstalk
