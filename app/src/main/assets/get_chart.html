@@ -1,0 +1,167 @@
+<html lang="en" >
+	<head>
+	    <meta charset="utf-8" />
+
+	    <script src="http://code.jquery.com/jquery-1.7.1.min.js"></script>
+	</head>
+	<body>
+	    <div id="container" class="chart"></div>
+	    <script src="https://code.highcharts.com/stock/highstock.js"></script>
+	    <script src="https://code.highcharts.com/stock/modules/data.js"></script>
+		<script src="https://code.highcharts.com/stock/modules/drag-panes.js"></script>
+		<script src="https://code.highcharts.com/stock/modules/exporting.js"></script>
+		<script src="https://code.highcharts.com/stock/indicators/indicators.js"></script>
+		<script src="https://code.highcharts.com/stock/indicators/volume-by-price.js"></script>
+
+		<script type='text/javascript'>
+			function getQueryParam() {
+				var urlParams = new URLSearchParams(window.location.search);
+				return urlParams.get('ticker');
+			}
+
+	    	function formatTime(date) {
+			    return date.getFullYear() + 
+			      '-' +
+			      (date.getMonth() > 8
+			        ? date.getMonth() + 1
+			        : '0' + (date.getMonth() + 1)) +
+			      '-' +
+			      (date.getDate() > 9
+			        ? date.getDate()
+			        : '0' + date.getDate()) +
+			      ' ' +
+			      (date.getHours() < 10 
+			        ? '0' 
+			        : '') + date.getHours() +
+			      ':' +
+			      (date.getMinutes() < 10 
+			        ? '0' 
+			        : '') + date.getMinutes() +
+			      ':' +
+			      (date.getSeconds() < 10 
+			        ? '0' 
+			        : '') + date.getSeconds()
+			}
+
+
+	    	$(document).ready(function() {
+	    		var ticker = getQueryParam() // Replace with dynamic
+
+				var curTime = formatTime(new Date())
+				var twoYearAgo = (parseInt(curTime.slice(0, 4)) - 2).toString() + curTime.slice(4)
+	    		var volumes = []
+    			var candleSticks = []
+    			var twoYearsChartsRawData = []
+
+    			var url = `http://nodeapp-env.eba-kgbwbpmw.us-east-1.elasticbeanstalk.com/api/twoyearscharts/${ticker}/${twoYearAgo}`
+
+    			// Fetch two years chart data for high stock chart
+    			fetch(url)
+    				.then(res => res.json())
+    				.then(result => {
+    					twoYearsChartsRawData = result
+    					console.log(twoYearsChartsRawData)
+
+    					twoYearsChartsRawData.map(entry => {
+					      const year = parseInt(entry.date.slice(0, 4))
+					      const month = parseInt(entry.date.slice(5, 7))
+					      const day = parseInt(entry.date.slice(8, 10))
+					      const hour = parseInt(entry.date.slice(11, 13))
+					      const minute = parseInt(entry.date.slice(14, 16))
+
+					      const date = Date.UTC(year, month - 1, day, hour - 8, minute)
+					      volumes.push([date, entry.volume])
+					      candleSticks.push([date, entry.open, entry.high, entry.low, entry.close])
+					    })
+
+						var twoYearsChartsOptions = {
+					      chart: {
+					        height: 340
+					      },
+					      rangeSelector: {
+					        selected: 2
+					      },
+					      xAxis: {
+					        type: 'datetime'
+					      },
+					      yAxis: [
+					        {
+					          startOnTick: false,
+					          endOnTick: false,
+					          labels: {
+					              align: 'right',
+					              x: -3
+					          },
+					          title: {
+					              text: 'OHLC'
+					          },
+					          height: '60%',
+					          lineWidth: 2,
+					          resize: {
+					              enabled: true
+					          }
+					        },
+					        {
+					          labels: {
+					              align: 'right',
+					              x: -3
+					          },
+					          title: {
+					              text: 'Volume'
+					          },
+					          top: '65%',
+					          height: '35%',
+					          offset: 0,
+					          lineWidth: 2
+					        }
+					      ],
+					      tooltip: {
+					        split: true
+					      },
+					      series: [
+					        {
+					          type: 'candlestick',
+					          name: ticker.toUpperCase(),
+					          id: 'ticker',
+					          zIndex: 2,
+					          data: candleSticks,
+					          yAxis: 0
+					        },
+					        {
+					          type: 'column',
+					          name: 'Volume',
+					          id: 'volume',
+					          data: volumes,
+					          yAxis: 1
+					        },
+					        {
+					          type: 'vbp',
+					          linkedTo: 'ticker',
+					          params: {
+					              volumeSeriesID: 'volume'
+					          },
+					          dataLabels: {
+					              enabled: false
+					          },
+					          zoneLines: {
+					              enabled: false
+					          }
+					        },
+					        {
+					          type: 'sma',
+					          linkedTo: 'ticker',
+					          zIndex: 1,
+					          marker: {
+					              enabled: false
+					          }
+					        }
+					      ]
+						}
+
+						Highcharts.stockChart('container', twoYearsChartsOptions)
+    				})
+
+	    	})
+		</script>
+	</body>
+</html>

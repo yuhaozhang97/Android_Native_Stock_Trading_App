@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <item
+        android:id="@+id/star"
+        android:icon="@drawable/ic_baseline_star_border_24"
+        android:title="@string/search_menu_title"
+        android:actionMenuTextAppearance="@style/Custom.TextAppearance.AppCompat.Widget.ActionBar.Menu"
+        app:showAsAction="always" />
+
+</menu>
