@@ -94,30 +94,17 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
-        renderList();
-
-        // Call backend every 15 seconds
+        // Sync latest data every 15 seconds
         final Handler ha = new Handler();
         ha.postDelayed(new Runnable() {
 
             @Override
             public void run() {
                 //call function
-                Log.d("helper", "Fetching stock info and prices in home page.");
+                renderList();
                 ha.postDelayed(this, 15000);
             }
-        }, 15000);
-
-//        final Handler ha = new Handler();
-//        ha.postDelayed(new Runnable() {
-//
-//            @Override
-//            public void run() {
-//                //call function
-//                renderList();
-//                ha.postDelayed(this, 15000);
-//            }
-//        }, 15000);
+        }, 0);
     }
 
     @Override
